@@ -45,13 +45,13 @@ char UART_getc(void)
 
 void UART_getLine(char* buf, int n)
 {
-	uint8_t bufIdx = 0;
+	uint8_t Idx = 0;
 	char c;
 	do
 	{
 		c = UART_getc();
-		buf[bufIdx++] = c;
+		buf[Idx++] = c;
 	}
-	while((bufIdx < n) && (c != '\n'));
-	buf[bufIdx] = 0;
+	while((Idx < n) && (c != '\n'));
+	buf[Idx] = 0;
 }
