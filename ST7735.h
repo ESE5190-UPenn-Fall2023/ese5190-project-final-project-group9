@@ -89,7 +89,5 @@ void SPI_ControllerTx(uint8_t data);
 void SPI_ControllerTx_stream(uint8_t stream);
 void SPI_ControllerTx_16bit(uint16_t data);
 void SPI_ControllerTx_16bit_stream(uint16_t data);
-void LCD_brightness(uint8_t intensity);
-void LCD_rotate(uint8_t r);
 
 #endif /* ST7735_H_ */
