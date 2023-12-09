@@ -3,39 +3,22 @@
 #include <avr/pgmspace.h>
 #include "ST7735.h"
 
-static void lcd_pin_init(void){
-	//Setup digital pins
-	LCD_DDR |= (1<<LCD_TFT_CS)|(1<<LCD_MOSI)|(1<<LCD_SCK);	//Set up output pins
-	DDRC |= (1<<LCD_DC)|(1<<LCD_RST);
-	LCD_LITE_DDR |= (1<<LCD_LITE);	//Set up output pins
-
-	//Setup PWM for LCD Backlight
-	TCCR0A |= (1<<COM0A1)|(1<<WGM01)|(1<<WGM00);	//Fast PWM: clear OC0A on match, set at bottom
-	TCCR0B |= (1<<CS02);	//clk/1024/256=244Hz
-	OCR0A = 127;	//Set starting PWM value
-
-	//Enable LCD by setting RST high
-	_delay_ms(50);
-	PORTC |= (1<<LCD_RST);
-}
-
 static void SPI_Controller_Init(void){
 	SPCR = (1<<SPE) | (1<<MSTR);		
 	SPSR = (1<<SPI2X);										
 }
 
+void SPI_ControllerTx(uint8_t data){
+	LCD_PORT &= ~(1<<LCD_TFT_CS); //pulled low
 
-void SPI_ControllerTx(uint8_t data){ //Send 8-bit packet SPI
-	LCD_PORT &= ~(1<<LCD_TFT_CS);	//CS pulled low to start communication
+	SPI_ControllerTx_stream(data); //load SPI buffer
 
-	SPI_ControllerTx_stream(data);
-
-	LCD_PORT |= (1<<LCD_TFT_CS);	//set CS to high
+	LCD_PORT |= (1<<LCD_TFT_CS); //pulled high
 }
 
 void SPI_ControllerTx_stream(uint8_t stream) {
-	SPDR = stream;		//Place data to be sent on registers
-	while(!(SPSR & (1<<SPIF)));	//wait for end of transmission
+	SPDR = stream;		//Place data in stream
+	while(!(SPSR & (1<<SPIF))); //wait for transmission to complete
 }
 
 void SPI_ControllerTx_16bit(uint16_t data){
@@ -58,6 +41,19 @@ void SPI_ControllerTx_16bit_stream(uint16_t data)
 	while(!(SPSR & (1<<SPIF)));	//wait for end of transmission
 	SPDR = data;		//Place data to be sent on registers
 	while(!(SPSR & (1<<SPIF)));	//wait for end of transmission
+}
+
+static void lcd_pin_init(void){
+	LCD_DDR |= (1<<LCD_TFT_CS)|(1<<LCD_MOSI)|(1<<LCD_SCK);	//Set up output pins
+	DDRC |= (1<<LCD_DC)|(1<<LCD_RST);
+	LCD_LITE_DDR |= (1<<LCD_LITE);	//Set up output pins
+
+	TCCR0A |= (1<<COM0A1)|(1<<WGM01)|(1<<WGM00);	//Fast PWM: clear OC0A on match, set at bottom
+	TCCR0B |= (1<<CS02);	//clk/1024/256=244Hz
+	OCR0A = 127;	//Set starting PWM value
+
+	_delay_ms(50);
+	PORTC |= (1<<LCD_RST);
 }
 
 void lcd_init(void)
