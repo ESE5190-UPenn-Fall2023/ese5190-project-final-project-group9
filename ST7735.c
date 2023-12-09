@@ -22,29 +22,27 @@ void SPI_ControllerTx_stream(uint8_t stream) {
 }
 
 void SPI_ControllerTx_16bit(uint16_t data){
-	uint8_t temp = data >> 8;
-	LCD_PORT &= ~(1<<LCD_TFT_CS);	//CS pulled low to start communication
+	uint8_t data_temp = data >> 8; //shift 16-bit data to placeholder on 8-bit uint
+	LCD_PORT &= ~(1<<LCD_TFT_CS);	
 	
-	SPDR = temp;		//Place data to be sent on registers
+	SPDR = data_temp;		//Place data in register
+	while(!(SPSR & (1<<SPIF)));	//wait for transmission to complete
+	SPDR = data;		
+	while(!(SPSR & (1<<SPIF)));	
+	
+	LCD_PORT |= (1<<LCD_TFT_CS);	
+}
+
+void SPI_ControllerTx_16bit_stream(uint16_t data){ //similar to SPI_ControllerTx_16bit but CS is pulled low/high once
+	uint8_t data_temp = (data >> 8);
+
+	SPDR = data_temp;		//Place data to be sent on registers
 	while(!(SPSR & (1<<SPIF)));	//wait for end of transmission
 	SPDR = data;		//Place data to be sent on registers
 	while(!(SPSR & (1<<SPIF)));	//wait for end of transmission
-	
-	LCD_PORT |= (1<<LCD_TFT_CS);	//set CS to high
 }
 
-void SPI_ControllerTx_16bit_stream(uint16_t data)
-{
-	uint8_t temp = data >> 8;
-
-	SPDR = temp;		//Place data to be sent on registers
-	while(!(SPSR & (1<<SPIF)));	//wait for end of transmission
-	SPDR = data;		//Place data to be sent on registers
-	while(!(SPSR & (1<<SPIF)));	//wait for end of transmission
-}
-
-void lcd_init(void)
-{
+void lcd_init(void){
 	LCD_DDR |= (1<<LCD_TFT_CS)|(1<<LCD_MOSI)|(1<<LCD_SCK);	//Set up output pins
 	DDRC |= (1<<LCD_DC)|(1<<LCD_RST);
 	LCD_LITE_DDR |= (1<<LCD_LITE);	//Set up output pins
@@ -60,30 +58,30 @@ void lcd_init(void)
 
 	static uint8_t ST7735_cmds[]  =
 	{
-		ST7735_SWRESET, 0, 150,       // Software reset. This first one is needed because of the RC reset.
+		ST7735_SWRESET, 0, 150,       // Software reset
 		ST7735_SLPOUT, 0, 255,       // Exit sleep mode
-		ST7735_FRMCTR1, 3, 0x01, 0x2C, 0x2D, 0,  // Frame rate control 1
-		ST7735_FRMCTR2, 3, 0x01, 0x2C, 0x2D, 0,  // Frame rate control 2
-		ST7735_FRMCTR3, 6, 0x01, 0x2C, 0x2D, 0x01, 0x2C, 0x2D, 0,  // Frame rate control 3
-		ST7735_INVCTR, 1, 0x07, 0,	// Display inversion
-		ST7735_PWCTR1, 3, 0x0A, 0x02, 0x84, 5, // Power control 1
-		ST7735_PWCTR2, 1, 0xC5, 5,       // Power control 2
-		ST7735_PWCTR3, 2, 0x0A, 0x00, 5,	// Power control 3
-		ST7735_PWCTR4, 2, 0x8A, 0x2A, 5,	// Power control 4
-		ST7735_PWCTR5, 2, 0x8A, 0xEE, 5,	// Power control 5
-		ST7735_VMCTR1, 1, 0x0E, 0, // Vcom control 1
-		ST7735_INVOFF, 0, 0,	//Inversion off
-		ST7735_MADCTL, 1, 0xC8, 0,	//Memory Access control
-		ST7735_COLMOD, 1, 0x05, 0,	//Interface pixel format
-		ST7735_CASET, 4, 0x00, 0x00, 0x00, 0x7F, 0,		//Column
-		ST7735_RASET, 4, 0x00, 0x00, 0x00, 0x9F, 0,		//Page
+		ST7735_FRMCTR1, 3, 0x01, 0x2C, 0x2D, 0,  
+		ST7735_FRMCTR2, 3, 0x01, 0x2C, 0x2D, 0,  
+		ST7735_FRMCTR3, 6, 0x01, 0x2C, 0x2D, 0x01, 0x2C, 0x2D, 0,  
+		ST7735_INVCTR, 1, 0x07, 0,	
+		ST7735_PWCTR1, 3, 0x0A, 0x02, 0x84, 5, 
+		ST7735_PWCTR2, 1, 0xC5, 5,      
+		ST7735_PWCTR3, 2, 0x0A, 0x00, 5,	
+		ST7735_PWCTR4, 2, 0x8A, 0x2A, 5,	
+		ST7735_PWCTR5, 2, 0x8A, 0xEE, 5,	
+		ST7735_VMCTR1, 1, 0x0E, 0, 
+		ST7735_INVOFF, 0, 0,	
+		ST7735_MADCTL, 1, 0xC8, 0,	
+		ST7735_COLMOD, 1, 0x05, 0,	
+		ST7735_CASET, 4, 0x00, 0x00, 0x00, 0x7F, 0,		
+		ST7735_RASET, 4, 0x00, 0x00, 0x00, 0x9F, 0,		
 		ST7735_GMCTRP1, 16, 0x02, 0x1C, 0x07, 0x12, 0x37, 0x32, 0x29, 0x2D,
-		0x29, 0x25, 0x2B, 0x39, 0x00, 0x01, 0x03, 0x10, 0, // Positive Gamma
+		0x29, 0x25, 0x2B, 0x39, 0x00, 0x01, 0x03, 0x10, 0, 
 		ST7735_GMCTRN1, 16, 0x03, 0x1D, 0x07, 0x06, 0x2E, 0x2C, 0x29,0x2D,
-		0x2E, 0x2E, 0x37, 0x3F, 0x00, 0x00, 0x02, 0x10, 0, // Negative Gamma
-		ST7735_NORON, 0, 10,	//Normal display on
-		ST7735_DISPON, 0, 100,            // Set display on
-		ST7735_MADCTL, 1, MADCTL_MX | MADCTL_MV | MADCTL_RGB, 10		//Default to rotation 3
+		0x2E, 0x2E, 0x37, 0x3F, 0x00, 0x00, 0x02, 0x10, 0, 
+		ST7735_NORON, 0, 10,	
+		ST7735_DISPON, 0, 100,           
+		ST7735_MADCTL, 1, MADCTL_MX | MADCTL_MV | MADCTL_RGB, 10		
 	};
 
 	sendCommands(ST7735_cmds, 22);
