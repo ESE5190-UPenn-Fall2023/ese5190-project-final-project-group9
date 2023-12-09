@@ -43,7 +43,8 @@ void SPI_ControllerTx_16bit_stream(uint16_t data)
 	while(!(SPSR & (1<<SPIF)));	//wait for end of transmission
 }
 
-static void lcd_pin_init(void){
+void lcd_init(void)
+{
 	LCD_DDR |= (1<<LCD_TFT_CS)|(1<<LCD_MOSI)|(1<<LCD_SCK);	//Set up output pins
 	DDRC |= (1<<LCD_DC)|(1<<LCD_RST);
 	LCD_LITE_DDR |= (1<<LCD_LITE);	//Set up output pins
@@ -54,11 +55,6 @@ static void lcd_pin_init(void){
 
 	_delay_ms(50);
 	PORTC |= (1<<LCD_RST);
-}
-
-void lcd_init(void)
-{
-	lcd_pin_init();
 	SPI_Controller_Init();
 	_delay_ms(5);
 
