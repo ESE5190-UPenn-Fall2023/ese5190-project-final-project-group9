@@ -1,8 +1,8 @@
-#include <avr/io.h>
-#include <util/delay.h>
 #include <avr/pgmspace.h>
 #include "ST7735.h"
-
+#include <avr/io.h>
+#include <util/delay.h>
+// SPI SUBROUTINES --------------
 static void SPI_Controller_Init(void){
 	SPCR = (1<<SPE) | (1<<MSTR);		
 	SPSR = (1<<SPI2X);										
@@ -42,6 +42,7 @@ void SPI_ControllerTx_16bit_stream(uint16_t data){ //similar to SPI_ControllerTx
 	while(!(SPSR & (1<<SPIF)));	//wait for end of transmission
 }
 
+// LCD SUBROUTINES --------------
 void lcd_init(void){
 	LCD_DDR |= (1<<LCD_TFT_CS)|(1<<LCD_MOSI)|(1<<LCD_SCK);	//Set up output pins
 	DDRC |= (1<<LCD_DC)|(1<<LCD_RST);
