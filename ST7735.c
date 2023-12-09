@@ -146,39 +146,3 @@ void Delay_ms(unsigned int n)
 		_delay_ms(1);
 	}
 }
-
-void LCD_brightness(uint8_t intensity)
-{
-	OCR0A = intensity; //pwm
-}
-
-void LCD_rotate(uint8_t r)
-{
-	uint8_t madctl = 0;
-	uint8_t rotation = r % 4; 
-
-	switch (rotation) {
-		case 0:
-			madctl = MADCTL_MX | MADCTL_MY | MADCTL_RGB;
-			break;
-		case 1:
-			madctl = MADCTL_MY | MADCTL_MV | MADCTL_RGB;
-			break;
-		case 2:
-			madctl = MADCTL_RGB;
-			break;
-		case 3:
-			madctl = MADCTL_MX | MADCTL_MV | MADCTL_RGB;
-			break;
-		default:
-			madctl = MADCTL_MX | MADCTL_MY | MADCTL_RGB;
-			break;
-	}
-	
-	uint8_t ST7735_cmds[]  =
-	{
-		ST7735_MADCTL, 1, madctl, 0
-	};
-	
-	sendCommands(ST7735_cmds, 1);
-}
