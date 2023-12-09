@@ -2,12 +2,12 @@
 #include "ST7735.h"
 #include <avr/io.h>
 #include <util/delay.h>
+
 // SPI SUBROUTINES --------------
-static void SPI_Controller_Init(void){
+static void SPI_Init(void){
 	SPCR = (1<<SPE) | (1<<MSTR);		
 	SPSR = (1<<SPI2X);										
 }
-
 void SPI_ControllerTx(uint8_t data){
 	LCD_PORT &= ~(1<<LCD_TFT_CS); //pulled low
 
@@ -54,7 +54,7 @@ void lcd_init(void){
 
 	_delay_ms(50);
 	PORTC |= (1<<LCD_RST);
-	SPI_Controller_Init();
+	SPI_Init();
 	_delay_ms(5);
 
 	static uint8_t ST7735_cmds[]  =
