@@ -93,43 +93,24 @@ void lcd_init(void)
 	sendCommands(ST7735_cmds, 22);
 }
 
-void sendCommands (const uint8_t *cmds, uint8_t length)
-{
-	//Command array structure:
-	//Command Code, # of data bytes, data bytes (if any), delay in ms
+void sendCommands (const uint8_t *cmds, uint8_t len){
 	uint8_t numCommands, numData, waitTime;
-
-	numCommands = length;	// # of commands to send
-
+	numCommands = len;	// # of commands to send
 	LCD_PORT &= ~(1<<LCD_TFT_CS);	//CS pulled low to start communication
 
-	while (numCommands--)	// Send each command
-	{
+	while (numCommands--){
 		PORTC &= ~(1<<LCD_DC);	//D/C pulled low for command
-		
 		SPI_ControllerTx_stream(*cmds++);
-		
-		numData = *cmds++;	// # of data bytes to send
-
-		PORTC |= (1<<LCD_DC);	//D/C set high for data
-		while (numData--)	// Send each data byte...
-		{
-			SPI_ControllerTx_stream(*cmds++);
-			
-		}
-
-		waitTime = *cmds++;     // Read post-command delay time (ms)
-		if (waitTime!=0)
-		{
-			Delay_ms((waitTime==255 ? 500 : waitTime));
-		}
+		numData = *cmds++;	
+		PORTC |= (1<<LCD_DC);	
+		while (numData--)	SPI_ControllerTx_stream(*cmds++);
+		waitTime = *cmds++;   
+		if (waitTime!=0) Delay_ms((waitTime==255 ? 500 : waitTime));
 	}
-
-	LCD_PORT |= (1<<LCD_TFT_CS);	//set CS to high
+	LCD_PORT |= (1<<LCD_TFT_CS);	
 }
 
-void LCD_setAddr(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
-{
+void LCD_setAddr(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1){
 	uint8_t ST7735_cmds[]  =
 	{
 		ST7735_CASET, 4, 0x00, x0, 0x00, x1, 0,		// Column
@@ -139,10 +120,6 @@ void LCD_setAddr(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
 	sendCommands(ST7735_cmds, 3);
 }
 
-void Delay_ms(unsigned int n)
-{
-	while (n--)
-	{
-		_delay_ms(1);
-	}
+void Delay_ms(unsigned int n){
+	while (n--) _delay_ms(1);
 }
