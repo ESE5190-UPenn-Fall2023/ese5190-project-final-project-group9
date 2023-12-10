@@ -1,16 +1,9 @@
-/*
- * LCD_GFX.h
- *
- * Created: 9/20/2021 6:54:37 PM
- *  Author: You
- */ 
-
 #include <avr/io.h>
 
 #ifndef LCD_GFX_H_
 #define LCD_GFX_H_
 
-// colors
+// colors defined
 #define	BLACK     0x0000
 #define WHITE     0xFFFF
 #define	BLUE      0x001F
