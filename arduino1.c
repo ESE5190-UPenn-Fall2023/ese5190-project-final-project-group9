@@ -1,9 +1,3 @@
-/*
- * GccApplication1.c
- *
- * Created: 11/27/123 9:51:48 AM
- * Author : rogun
- */ 
 #define F_CPU 16000000
 #include "motor_sequence.h"
 #include <avr/io.h>
@@ -17,7 +11,7 @@
 #define BAUD_PRESCALER (((F_CPU / (BAUD_RATE * 16UL))) - 1)
 
 
-int angle = 0;
+int angle = 0; // 
 uint8_t step = 0;
 char message[10];
 int target = 0;
@@ -31,6 +25,8 @@ void initialize()
 	DDRD |= (1<<PORTD3);
 	DDRD |= (1<<PORTD4);
 	DDRD |= (1<<PORTD5);
+
+	// Push button and joystick control
 	DDRC &= ~(1<<PORTC1);
 	DDRC &= ~(1<<PORTC4);
 	
@@ -38,12 +34,12 @@ void initialize()
 	DDRD |= (1<<PORTB3);
 	DDRD |= (1<<PORTB4);
 	DDRD |= (1<<PORTB5);
-	DDRC &= ~(1<<PORTC3);
+
 	
-	//Toggle between manual and auto rotation mode
+	//Joystick control and push button pulled down
 	PORTC &= ~(1<<PORTC1); 
-	PORTC &= ~(1<<PORTC3);
 	PORTC &= ~(1<<PORTC4); 
+	
 	//Joystick control
 	ADMUX = (1<<REFS0);
 	ADCSRA |= (1<<ADEN) | (1<<ADPS2) | (1<<ADPS1) | (1<<ADPS0);
@@ -52,7 +48,7 @@ void initialize()
 	
 }
 
-void button_press_rot_cntrl_motor1()
+void button_press_rot_cntrl_motor1() // Button press to toggle between auto and manual rotation
 {
 	if((PINC & (1<<PINC4)) != (1<<PINC4))
 	{
@@ -63,7 +59,7 @@ void button_press_rot_cntrl_motor1()
 
 }
 
-void counter_clockwise_motor1()
+void counter_clockwise_motor1() // Function to rotate motor clockwise and measure the angle
 {
 		counter_clockwise_motor1_seq();
 		if (step == 0)
@@ -76,7 +72,7 @@ void counter_clockwise_motor1()
 			
 }
 
-void clockwise_motor1()
+void clockwise_motor1() // Function to rotate motor clockwise and measure the angle
 {
 
 		clockwise_motor1_seq();
@@ -102,7 +98,7 @@ int main(void)
  		ADCSRA |= (1<<ADSC);
  		while(ADCSRA & (1<<ADSC));
 		 button_press_rot_cntrl_motor1();
-		 if(angle == 360)
+		 if(angle == 360) 
 		 {
 			 dir = 0;
 		 }
@@ -127,11 +123,6 @@ int main(void)
 		 sprintf(message,"%d",angle);
  	 	strcat(message,"\n");
  		UART_putstring(message);
-		// _delay_ms(10);
-		 
-		 
-		
-	
 	}
 }
 
