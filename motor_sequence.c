@@ -1,9 +1,4 @@
-/*
- * motor_sequence.c
- *
- * Created: 12/2/2023 11:09:08 PM
- *  Author: rogun
- */ 
+
 #define F_CPU 16000000
 #include <avr/io.h>
 #include <util/delay.h>
