@@ -1,9 +1,3 @@
-/*
- * motor_sequence.h
- *
- * Created: 12/2/2023 11:10:22 PM
- *  Author: rogun
- */ 
 
 
 #ifndef MOTOR_SEQUENCE_H_
