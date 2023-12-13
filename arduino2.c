@@ -50,12 +50,7 @@ ISR(TIMER1_COMPA_vect) {
 //Trig Pulse Delay
 ISR(TIMER1_OVF_vect) {
 	ovfCount += 1;
-	//Enable Output Compare after 2 Overflows
-	//if(ovfCount >= 2) {
-	//TCCR1A |= (1<<COM1A0);
-	//TCCR1A &= ~(1<<COM1A1);
-	//ovfCount = 0;
-	//}
+	}
 }
 void PingDistance() {
 	//Enables output compare to send sensor trig
@@ -125,7 +120,7 @@ int Mapfield(void){
 	for (i = circle_spacing*circle_num; i>0; i-= circle_spacing){
 		LCD_drawHollowCircle(mid_x, mid_y, i, WHITE);
 	}
-	//LCD_drawHollowCircle(mid_x, mid_y, 20, 1, WHITE, BLACK);
+	
 }
  
 int objectMap(uint16_t angle, int dist){
@@ -140,7 +135,6 @@ int objectMap(uint16_t angle, int dist){
 	float conv = max_dist_scr/max_dist_glo;
 	x0 = dist*cos(angleRad)*conv + LCD_WIDTH/2; 
 	y0 = dist*sin(angleRad)*conv + LCD_HEIGHT/2;
-	//LCD_drawPixel((int)x0, (int)y0, GREEN);
 	LCD_drawFilledCircle((int)x0, (int)y0, 1, GREEN);
  
 }
@@ -175,20 +169,9 @@ void loop(){
 	if(printVar) {
 		//Distance calculation
 		cmVal = elapsed / (58*2);
- 
-		
-		//sprintf(x,"%d",angle);
-		//strcat(x,"\n");
-		//UART_putstring(angle_motor);
- 
 		//Reset for next Echo
 		objectMap(angle, cmVal);
 		angle1 = angle;
-		//sprintf(x,"%d",angle);
-		//strcat(x,"\n");
-		//UART_putstring(x);
-		//_delay_ms(100);
-		//objectMap(angle, cmVal,0);
 		
 		sprintf(message,"%d",cmVal);
 		strcat(message,"\n");
@@ -202,11 +185,7 @@ void loop(){
 		elapsed = 0;
 	}
 	anglePrev = angle;
-	/*
-	scanner(angle,1);
-	_delay_ms(2);
-	scanner(angle,0);
-	*/
+	
 }
  
 int main(void){
