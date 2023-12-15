@@ -36,31 +36,29 @@ void SPI_ControllerTx_16bit(uint16_t data){ // load 16-bit data to send
 void SPI_ControllerTx_16bit_stream(uint16_t data){ // load 16-bit data to send continuously
 	uint8_t data_temp = (data >> 8);
 
-	SPDR = data_temp;		//Place data to be sent on registers
-	while(!(SPSR & (1<<SPIF)));	//wait for end of transmission
-	SPDR = data;		//Place data to be sent on registers
-	while(!(SPSR & (1<<SPIF)));	//wait for end of transmission
+	SPDR = data_temp;		// place data to be sent on registers
+	while(!(SPSR & (1<<SPIF)));	// wait for end of transmission
+	SPDR = data;		// place data to be sent on registers
+	while(!(SPSR & (1<<SPIF)));	// wait for end of transmission
 }
 
 // LCD SUBROUTINES --------------
 void lcd_init(void){
-	LCD_DDR |= (1<<LCD_TFT_CS)|(1<<LCD_MOSI)|(1<<LCD_SCK);	//Set up output pins
-	DDRC |= (1<<LCD_DC)|(1<<LCD_RST);
-	LCD_LITE_DDR |= (1<<LCD_LITE);	//Set up output pins
+	LCD_DDR |= (1<<LCD_TFT_CS)|(1<<LCD_MOSI)|(1<<LCD_SCK);	// set CS, MOSI, and Clk as output pins
+	DDRC |= (1<<LCD_DC)|(1<<LCD_RST); // set DC and reset as output pins
+	LCD_LITE_DDR |= (1<<LCD_LITE);	// set lite as output pins
 
-	TCCR0A |= (1<<COM0A1)|(1<<WGM01)|(1<<WGM00);	//Fast PWM: clear OC0A on match, set at bottom
-	TCCR0B |= (1<<CS02);	//clk/1024/256=244Hz
-	OCR0A = 127;	//Set starting PWM value
+	TCCR0A |= (1<<COM0A1)|(1<<WGM01)|(1<<WGM00); // set as Fast PWM
+	TCCR0B |= (1<<CS02); // set /256 prescalar
+	OCR0A = 127;
 
-	_delay_ms(50);
-	PORTC |= (1<<LCD_RST);
+	PORTC |= (1<<LCD_RST); //reset
 	SPI_Init();
-	_delay_ms(5);
 
-	static uint8_t ST7735_cmds[]  =
+	static uint8_t ST7735_cmds[]  = //initialization command (based on Lab 4 code)
 	{
-		ST7735_SWRESET, 0, 150,       // Software reset
-		ST7735_SLPOUT, 0, 255,       // Exit sleep mode
+		ST7735_SWRESET, 0, 150,       
+		ST7735_SLPOUT, 0, 255,      
 		ST7735_FRMCTR1, 3, 0x01, 0x2C, 0x2D, 0,  
 		ST7735_FRMCTR2, 3, 0x01, 0x2C, 0x2D, 0,  
 		ST7735_FRMCTR3, 6, 0x01, 0x2C, 0x2D, 0x01, 0x2C, 0x2D, 0,  
@@ -91,22 +89,22 @@ void lcd_init(void){
 void sendCommands (const uint8_t *cmds, uint8_t len){
 	uint8_t numCommands, numData, waitTime;
 	numCommands = len;	// # of commands to send
-	LCD_PORT &= ~(1<<LCD_TFT_CS);	//CS pulled low to start communication
+	LCD_PORT &= ~(1<<LCD_TFT_CS);	// CS pulled low to start communication
 
 	while (numCommands--){
-		PORTC &= ~(1<<LCD_DC);	//D/C pulled low for command
-		SPI_ControllerTx_stream(*cmds++);
+		PORTC &= ~(1<<LCD_DC);	// D/C pulled low for command
+		SPI_ControllerTx_stream(*cmds++); // sends command from array one at a time
 		numData = *cmds++;	
 		PORTC |= (1<<LCD_DC);	
 		while (numData--)	SPI_ControllerTx_stream(*cmds++);
 		waitTime = *cmds++;   
 		if (waitTime!=0) Delay_ms((waitTime==255 ? 500 : waitTime));
 	}
-	LCD_PORT |= (1<<LCD_TFT_CS);	
+	LCD_PORT |= (1<<LCD_TFT_CS); // CS pulled high	
 }
 
 void LCD_setAddr(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1){
-	uint8_t ST7735_cmds[]  =
+	uint8_t ST7735_cmds[]  = // command responsible for accessing row and column of pixels (based on lab 4)
 	{
 		ST7735_CASET, 4, 0x00, x0, 0x00, x1, 0,		// Column
 		ST7735_RASET, 4, 0x00, y0, 0x00, y1, 0,		// Page
