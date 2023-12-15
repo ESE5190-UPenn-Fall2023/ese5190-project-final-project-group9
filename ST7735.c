@@ -5,15 +5,15 @@
 
 // SPI SUBROUTINES --------------
 static void SPI_Init(void){
-	SPCR = (1<<SPE) | (1<<MSTR);		
-	SPSR = (1<<SPI2X);										
+	SPCR = (1<<SPE) | (1<<MSTR); // set the SPI enable and master bit	
+	SPSR = (1<<SPI2X); // set the prescalar to /2										
 }
-void SPI_ControllerTx(uint8_t data){
-	LCD_PORT &= ~(1<<LCD_TFT_CS); //pulled low
+void SPI_ControllerTx(uint8_t data){ // load 8-bit data to sned
+	LCD_PORT &= ~(1<<LCD_TFT_CS); //pulled CS low
 
 	SPI_ControllerTx_stream(data); //load SPI buffer
 
-	LCD_PORT |= (1<<LCD_TFT_CS); //pulled high
+	LCD_PORT |= (1<<LCD_TFT_CS); //pulled CS high
 }
 
 void SPI_ControllerTx_stream(uint8_t stream) {
