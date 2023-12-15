@@ -8,32 +8,32 @@ static void SPI_Init(void){
 	SPCR = (1<<SPE) | (1<<MSTR); // set the SPI enable and master bit	
 	SPSR = (1<<SPI2X); // set the prescalar to /2										
 }
-void SPI_ControllerTx(uint8_t data){ // load 8-bit data to sned
-	LCD_PORT &= ~(1<<LCD_TFT_CS); //pulled CS low
+void SPI_ControllerTx(uint8_t data){ // load 8-bit data to send
+	LCD_PORT &= ~(1<<LCD_TFT_CS); // pulled CS low
 
-	SPI_ControllerTx_stream(data); //load SPI buffer
+	SPI_ControllerTx_stream(data); // load SPI buffer
 
-	LCD_PORT |= (1<<LCD_TFT_CS); //pulled CS high
+	LCD_PORT |= (1<<LCD_TFT_CS); // pulled CS high
 }
 
-void SPI_ControllerTx_stream(uint8_t stream) {
-	SPDR = stream;		//Place data in stream
-	while(!(SPSR & (1<<SPIF))); //wait for transmission to complete
+void SPI_ControllerTx_stream(uint8_t stream) { // load 8-bit data to send continuously
+	SPDR = stream;		// store data into SPI Data register
+	while(!(SPSR & (1<<SPIF))); // when data transfer is complete, the SPIF flag is set
 }
 
-void SPI_ControllerTx_16bit(uint16_t data){
-	uint8_t data_temp = data >> 8; //shift 16-bit data to placeholder on 8-bit uint
-	LCD_PORT &= ~(1<<LCD_TFT_CS);	
+void SPI_ControllerTx_16bit(uint16_t data){ // load 16-bit data to send
+	uint8_t data_temp = data >> 8; // shift 16-bit data to placeholder on 8-bit uint
+	LCD_PORT &= ~(1<<LCD_TFT_CS); // pulled CS low	
 	
-	SPDR = data_temp;		//Place data in register
-	while(!(SPSR & (1<<SPIF)));	//wait for transmission to complete
+	SPDR = data_temp;		// place data in register
+	while(!(SPSR & (1<<SPIF)));	// wait for transmission to complete
 	SPDR = data;		
-	while(!(SPSR & (1<<SPIF)));	
+	while(!(SPSR & (1<<SPIF)));	// when data transfer is complete, the SPIF flag is set
 	
-	LCD_PORT |= (1<<LCD_TFT_CS);	
+	LCD_PORT |= (1<<LCD_TFT_CS); // pulled CS high	
 }
 
-void SPI_ControllerTx_16bit_stream(uint16_t data){ //similar to SPI_ControllerTx_16bit but CS is pulled low/high once
+void SPI_ControllerTx_16bit_stream(uint16_t data){ // load 16-bit data to send continuously
 	uint8_t data_temp = (data >> 8);
 
 	SPDR = data_temp;		//Place data to be sent on registers
