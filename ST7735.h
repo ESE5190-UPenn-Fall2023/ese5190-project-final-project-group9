@@ -32,7 +32,7 @@
 #define LCD_HEIGHT 128
 #define LCD_SIZE  LCD_WIDTH * LCD_HEIGHT
 
-// ST7735 registers
+// ST7735 registers (based on Lab 4 code)
 #define ST7735_NOP     0x00
 #define ST7735_SWRESET 0x01
 #define ST7735_RDDID   0x04
@@ -79,9 +79,9 @@
 #define MADCTL_BGR 0x08
 #define MADCTL_MH  0x04
 
-void lcd_init(void);
-void sendCommands (const uint8_t *cmds, uint8_t length);
-void LCD_setAddr(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1);
+void lcd_init(void); // initialize LCD
+void sendCommands (const uint8_t *cmds, uint8_t length); //send command
+void LCD_setAddr(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1); // access pixels on screen 
 void SPI_ControllerTx(uint8_t data);
 void SPI_ControllerTx_stream(uint8_t stream);
 void SPI_ControllerTx_16bit(uint16_t data);
