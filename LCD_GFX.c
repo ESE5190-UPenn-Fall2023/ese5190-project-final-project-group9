@@ -4,8 +4,7 @@
 #include <stdio.h>
 #include <math.h>
 
-uint16_t rgb565(uint8_t red, uint8_t green, uint8_t blue)
-{
+uint16_t rgb565(uint8_t red, uint8_t green, uint8_t blue){ // convert from 24-bit color to 16-bit color
 	return ((((31*(red+4))/255)<<11) | (((63*(green+2))/255)<<5) | ((31*(blue+4))/255));
 }
 
@@ -41,7 +40,7 @@ void LCD_drawHollowCircle(uint8_t x0, uint8_t y0, uint8_t radius, uint16_t color
 
 }
 
-void LCD_drawLine(short x0,short y0,short x1,short y1,uint16_t color){
+void LCD_drawLine(short x0,short y0,short x1,short y1,uint16_t color){ // Bresenham's line algorithm
     int dx = abs(x1 - x0);
     int dy = -abs(y1 - y0);
     int sx = x0 < x1 ? 1 : -1;
